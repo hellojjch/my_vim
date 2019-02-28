@@ -1,7 +1,103 @@
-"call vundle#begin()
-"Plugin 'Valloric/YouCompleteMe’
-"call vundle#end()
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/nerdtree'
+Plugin 'tpope/vim-commentary'
+Plugin 'Yggdroot/indentLine'
+Plugin 'Lokaltog/vim-powerline'
+Plugin 'jiangmiao/auto-pairs'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
 set nocompatible                 "去掉有关vi一致性模式，避免以前版本的bug和局限    
+
+"使用F1打开目录树
+nnoremap <silent> <F1> :NERDTree<CR>		
+
+"使用F5,自动执行代码
+map <F5> :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+        exec "w"
+        if &filetype == 'c'
+                exec "!g++ % -o %<"
+                exec "!time ./%<"
+        elseif &filetype == 'cpp'
+                exec "!g++ % -o %<"
+                exec "!time ./%<"
+        elseif &filetype == 'java'
+                exec "!javac %"
+                exec "!time java %<"
+        elseif &filetype == 'sh'
+                :!time bash %
+        elseif &filetype == 'python'
+                exec "!clear"
+                exec "!time python %"
+        elseif &filetype == 'html'
+                exec "!firefox % &"
+        elseif &filetype == 'go'
+                " exec "!go build %<"
+                exec "!time go run %"
+        elseif &filetype == 'mkd'
+                exec "!~/.vim/markdown.pl % > %.html &"
+                exec "!firefox %.html &"
+        endif
+endfunc
+""""""""""""""""""""""""""""""""
+"		配置YouCompleteMe      "    
+""""""""""""""""""""""""""""""""
+highlight PMenu ctermfg=0 ctermbg=242 guifg=black guibg=darkgrey
+highlight PMenuSel ctermfg=111 ctermbg=124 guifg=darkgrey guibg=black
+"打开vim时不再询问是否加载ycm_extra_conf.py配置
+let g:ycm_confirm_extra_conf = 0
+set completeopt=longest,menu
+"自动开启语义补全
+let g:ycm_seed_identifiers_with_syntax = 1
+"在注释中也开启补全
+let g:ycm_complete_in_comments = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
+"字符串中也开启补全
+let g:ycm_complete_in_strings = 1
+let g:ycm_collect_identifiers_from_tags_files = 1
+"开启基于tag的补全，可以在这之后添加需要的标签路径
+let g:ycm_collect_identifiers_from_tags_files = 1
+"开始补全的字符数
+let g:ycm_min_num_of_chars_for_completion = 2
+"补全后自动关闭预览窗口
+let g:ycm_autoclose_preview_window_after_completion = 1
+"禁止缓存匹配项,每次都重新生成匹配项
+let g:ycm_cache_omnifunc=0
+"离开插入模式后自动关闭预览窗口
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+"语法关键字补全
+let g:ycm_seed_identifiers_with_syntax = 1
+"整合UltiSnips的提示
+let g:ycm_use_ultisnips_completer = 1
+"在实现和声明之间跳转,并分屏打开
+let g:ycm_goto_buffer_command = 'horizontal-split'
+nnoremap <Leader>g :YcmCompleter GoTo<CR>
+"与syntastic有冲突，建议关闭
+let g:ycm_show_diagnostics_ui = 0
+"let g:ycm_error_symbol = '>>'
+"let g:ycm_warning_symbol = '>>'
+let g:ycm_enable_diagnostic_signs = 0
+let g:ycm_enable_diagnostic_highlighting = 0
+let g:ycm_echo_current_diagnostic = 0
+
+"为python和shell等添加注释
+autocmd FileType python,shell,coffee set commentstring=#\ %s
+"修改注释风格
+autocmd FileType java,c,cpp set commentstring=//\ %s
 
 set nu!                                    "显示行号
 
@@ -40,6 +136,8 @@ set paste									"原文本格式粘贴
 "set mouse=a									"开启鼠标模式
 
 set nohls                                "默认情况下，寻找匹配是高亮度显示，该设置关闭高亮显示     
+
+au BufReadPost * if line("'\"") > 0|if line("'\"")  <=line("$")|exe("norm       '\"")|else|exe "norm $"|endif|endif				"打开文件定位到光标上次所指的位置
 
 set incsearch                        "在程序中查询一单词，自动匹配单词的位置；如查询desk单词，当输到/d时，会自动找到第一个d开头的单词，当输入到/de时，会自动找到第一个以ds开头的单词，以此类推，进行查找；当找到要匹配的单词时，别忘记回车 
 
